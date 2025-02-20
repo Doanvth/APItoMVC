@@ -1,0 +1,41 @@
+﻿@model List<APItoMVC.Models.Product>
+
+<h2>Danh sách sản phẩm</h2>
+<a href="/Products/Create" class="btn btn-primary">Thêm sản phẩm</a>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<table class="table">
+    <tr>
+        <th>ID</th>
+        <th>Tên sản phẩm</th>
+        <th>Giá</th>
+        <th>Hành động</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.Price</td>
+                <td>
+                    <a href="/Products/Details/@item.Id" class="btn btn-info">Chi tiết</a>
+                    <a href="/Products/Edit/@item.Id" class="btn btn-warning">Sửa</a>
+            <td>
+                <a href="@Url.Action("Delete", "Product", new { id = item.Id })"
+                   onclick="return confirm('Bạn có chắc chắn muốn xoá sản phẩm này?');"
+                   class="btn btn-danger">
+                    Xoá
+                </a>
+            </td>
+                </td>
+            </tr>
+    }
+</table>
+

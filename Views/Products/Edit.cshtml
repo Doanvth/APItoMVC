@@ -1,0 +1,10 @@
+﻿@model APItoMVC.Models.Product
+
+<h2>Xác nhận xoá</h2>
+<p>Bạn có chắc chắn muốn xoá sản phẩm: <strong>@Model.Name</strong> không?</p>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Xoá</button>
+    <a asp-action="Index" class="btn btn-secondary">Huỷ</a>
+</form>
