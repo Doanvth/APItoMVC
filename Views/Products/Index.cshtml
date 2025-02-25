@@ -5,37 +5,89 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
         @TempData["SuccessMessage"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-<table class="table">
-    <tr>
-        <th>ID</th>
-        <th>Tên sản phẩm</th>
-        <th>Giá</th>
-        <th>Hành động</th>
-    </tr>
-    @foreach (var item in Model)
-    {
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên sản phẩm</th>
+            <th>Giá</th>
+            <th>Danh mục</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
             <tr>
                 <td>@item.Id</td>
                 <td>@item.Name</td>
-                <td>@item.Price</td>
+                <td>@item.Price.ToString("C")</td>
+                <td>@(item.Category?.Name ?? "Chưa có danh mục")</td>
                 <td>
                     <a href="/Products/Details/@item.Id" class="btn btn-info">Chi tiết</a>
                     <a href="/Products/Edit/@item.Id" class="btn btn-warning">Sửa</a>
-            <td>
-                <a href="@Url.Action("Delete", "Product", new { id = item.Id })"
-                   onclick="return confirm('Bạn có chắc chắn muốn xoá sản phẩm này?');"
-                   class="btn btn-danger">
-                    Xoá
-                </a>
-            </td>
+
+                    <!-- Nút Xóa mở modal -->
+                    <button class="btn btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#confirmDeleteModal"
+                            data-productid="@item.Id">
+                        Xóa
+                    </button>
                 </td>
             </tr>
-    }
+        }
+    </tbody>
 </table>
+
+<!-- Modal Xác nhận Xóa -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn xóa sản phẩm này không?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <a id="confirmDeleteBtn" class="btn btn-danger">Xóa</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+    confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var productId = button.getAttribute('data-productid');
+        var deleteUrl = '/Products/Delete/' + productId;
+        document.getElementById('confirmDeleteBtn').setAttribute('href', deleteUrl);
+    });
+    // Đợi 2 giây (2000ms) rồi ẩn thông báo
+    setTimeout(function () {
+        let alertElements = document.querySelectorAll('.alert-dismissible');
+        alertElements.forEach(function (alert) {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 2000);
+</script>
+
 

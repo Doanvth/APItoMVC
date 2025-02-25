@@ -1,0 +1,39 @@
+﻿@model List<Category>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Danh sách danh mục</h2>
+
+    <a asp-action="Create" class="btn btn-primary mb-3">Thêm danh mục</a>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên danh mục</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                @foreach (var category in Model)
+                {
+                    <tr>
+                        <td>@category.Id</td>
+                        <td>@category.Name</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-warning btn-sm">Sửa</a>
+                            <a asp-action="Delete" asp-route-id="@category.Id" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center text-muted">Không có danh mục nào.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,6 +1,7 @@
 ﻿using APItoMVC.Models;
 using APItoMVC.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace APItoMVC.Controllers
 {
@@ -8,9 +9,9 @@ namespace APItoMVC.Controllers
     {
         private readonly ProductService _productService;
 
-        public ProductsController(ProductService productService)
+        public ProductsController()
         {
-            _productService = productService;
+            _productService = new ProductService();
         }
 
         public async Task<IActionResult> Index()
@@ -19,58 +20,75 @@ namespace APItoMVC.Controllers
             return View(products);
         }
 
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Create()
         {
-            var product = await _productService.GetProductByIdAsync(id);
-            return View(product);
-        }
-
-        public IActionResult Create()
-        {
+            ViewBag.Categories = await _productService.GetCategoriesAsync();
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(Product product)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                await _productService.CreateProductAsync(product);
-                return RedirectToAction(nameof(Index));
+                ViewBag.Categories = await _productService.GetCategoriesAsync();
+                return View(product);
             }
-            return View(product);
+
+            bool success = await _productService.CreateProductAsync(product);
+            if (!success)
+            {
+                ModelState.AddModelError("", "Không thể thêm sản phẩm. Kiểm tra lại API!");
+                ViewBag.Categories = await _productService.GetCategoriesAsync();
+                return View(product);
+            }
+
+            return RedirectToAction(nameof(Index));
         }
+
 
         public async Task<IActionResult> Edit(int id)
         {
             var product = await _productService.GetProductByIdAsync(id);
+            if (product == null) return NotFound();
+
+            ViewBag.Categories = await _productService.GetCategoriesAsync();
             return View(product);
         }
 
         [HttpPost]
         public async Task<IActionResult> Edit(int id, Product product)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                await _productService.UpdateProductAsync(id, product);
-                return RedirectToAction(nameof(Index));
+                ViewBag.Categories = await _productService.GetCategoriesAsync();
+                return View(product);
             }
-            return View(product);
+
+            bool success = await _productService.UpdateProductAsync(id, product);
+            if (!success)
+            {
+                ModelState.AddModelError("", "Không thể cập nhật sản phẩm. Kiểm tra lại API!");
+                ViewBag.Categories = await _productService.GetCategoriesAsync();
+                return View(product);
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet]
-        [Route("Product/Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var product = await _productService.GetProductByIdAsync(id);
-            if (product == null)
+            var success = await _productService.DeleteProductAsync(id);
+
+            if (success)
             {
-                return NotFound();
+                TempData["SuccessMessage"] = "Xóa sản phẩm thành công!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không thể xóa sản phẩm!";
             }
 
-            await _productService.DeleteProductAsync(id);
-
-            TempData["SuccessMessage"] = $"Sản phẩm '{product.Name}' đã được xoá thành công.";
             return RedirectToAction(nameof(Index));
         }
 

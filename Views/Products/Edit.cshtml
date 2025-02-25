@@ -1,10 +1,28 @@
 ﻿@model APItoMVC.Models.Product
 
-<h2>Xác nhận xoá</h2>
-<p>Bạn có chắc chắn muốn xoá sản phẩm: <strong>@Model.Name</strong> không?</p>
+<h2>Chỉnh sửa sản phẩm</h2>
 
-<form asp-action="Delete" method="post">
+<form asp-action="Edit" method="post">
     <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Xoá</button>
-    <a asp-action="Index" class="btn btn-secondary">Huỷ</a>
+
+    <div class="form-group">
+        <label>Tên sản phẩm</label>
+        <input asp-for="Name" class="form-control" required />
+    </div>
+    <div>
+        <label>Giá</label>
+        <input asp-for="Price" type="number" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label>Danh mục</label>
+        <select asp-for="CategoryId" class="form-control">
+            @foreach (var category in ViewBag.Categories)
+            {
+                <option value="@category.Id">@category.Name</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Cập nhật</button>
 </form>

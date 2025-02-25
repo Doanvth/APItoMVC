@@ -1,3 +1,5 @@
+﻿
+
 using APItoMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,8 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-//??ng k� Products
+// Đăng ký HttpClient
+builder.Services.AddHttpClient();
+
+//Đăng ký Products
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<CategoryService>();
+
 
 var app = builder.Build();
 
