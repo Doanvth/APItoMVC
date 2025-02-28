@@ -1,5 +1,9 @@
 ﻿@model List<APItoMVC.Models.Product>
 
+@{
+    string apiBaseUrl = "https://localhost:7291"; // Thay đổi theo URL của API
+}
+
 <h2>Danh sách sản phẩm</h2>
 <a href="/Products/Create" class="btn btn-primary">Thêm sản phẩm</a>
 
@@ -19,10 +23,11 @@
     </div>
 }
 
-<table class="table mt-3">
-    <thead>
+<table class="table table-bordered mt-3">
+    <thead class="table-dark">
         <tr>
             <th>ID</th>
+            <th>Hình ảnh</th> <!-- Cột hình ảnh -->
             <th>Tên sản phẩm</th>
             <th>Giá</th>
             <th>Danh mục</th>
@@ -34,6 +39,23 @@
         {
             <tr>
                 <td>@item.Id</td>
+                <td class="text-center">
+                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                    {
+                        var fullImageUrl = $"https://localhost:7291{item.ImageUrl}";
+                        <img src="@fullImageUrl"
+                             alt="@item.Name" width="100" height="100"
+                             style="object-fit: cover; border-radius: 5px;"
+                             title="@item.Name">
+                    }
+                    else
+                    {
+                        <img src="/images/default-placeholder.png"
+                             alt="Ảnh mặc định" width="100" height="100"
+                             style="opacity: 0.5;">
+                    }
+                </td>
+
                 <td>@item.Name</td>
                 <td>@item.Price.ToString("C")</td>
                 <td>@(item.Category?.Name ?? "Chưa có danh mục")</td>
@@ -73,21 +95,23 @@
 </div>
 
 <script>
-    var confirmDeleteModal = document.getElementById('confirmDeleteModal');
-    confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
-        var productId = button.getAttribute('data-productid');
-        var deleteUrl = '/Products/Delete/' + productId;
-        document.getElementById('confirmDeleteBtn').setAttribute('href', deleteUrl);
-    });
-    // Đợi 2 giây (2000ms) rồi ẩn thông báo
-    setTimeout(function () {
-        let alertElements = document.querySelectorAll('.alert-dismissible');
-        alertElements.forEach(function (alert) {
-            let bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
+    document.addEventListener("DOMContentLoaded", function () {
+        var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+
+        confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var productId = button.getAttribute('data-productid');
+            var deleteUrl = '/Products/Delete/' + productId;
+            document.getElementById('confirmDeleteBtn').setAttribute('href', deleteUrl);
         });
-    }, 2000);
+
+        // Ẩn thông báo sau 2 giây
+        setTimeout(function () {
+            let alertElements = document.querySelectorAll('.alert-dismissible');
+            alertElements.forEach(function (alert) {
+                let bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 2000);
+    });
 </script>
-
-
